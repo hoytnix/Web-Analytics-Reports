@@ -176,3 +176,13 @@ class ReportSection:
     display_label: str
     window: TimeWindow
     metrics: SectionMetrics
+    executive_brief: Optional[str] = None
+
+    @property
+    def executive_brief_html(self) -> str:
+        """Return HTML-formatted executive brief for Jinja templates."""
+        if not self.executive_brief:
+            return ""
+        from .utils import markdown_to_html
+        return markdown_to_html(self.executive_brief)
+

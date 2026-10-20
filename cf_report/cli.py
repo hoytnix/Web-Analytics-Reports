@@ -19,6 +19,7 @@ from .config import (
     CADENCE_DEFINITIONS,
     CF_ACCOUNT_ID,
     CF_API_TOKEN,
+    GEMINI_API_KEY,
     TARGET_ALIASES,
     VERCEL_PROJECTS,
     VERCEL_TEAM_ID,
@@ -26,6 +27,7 @@ from .config import (
     ZONES,
     CadenceDefinition,
 )
+from .gemini.client import GeminiClient
 from .models import BreakdownItem, ReportSection, TimeWindow, VercelData
 from .renderers.cli import render_cli_section
 from .renderers.html import render_full_html_document
@@ -93,6 +95,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Override Vercel API token",
     )
     parser.add_argument(
+        "--gemini-key",
+        help="Override Gemini API key for AI executive briefs",
+    )
+    parser.add_argument(
+        "--no-gemini",
+        action="store_true",
+        help="Disable Gemini AI executive briefs even if key is configured",
+    )
+    parser.add_argument(
         "--engine",
         choices=["weasyprint", "chromium", "google-chrome"],
         help="Select specific PDF rendering engine",
@@ -104,6 +115,7 @@ def process_section(
     cadence: CadenceDefinition,
     cf_client: CloudflareClient,
     vercel_client: VercelClient,
+    gemini_client: Optional[GeminiClient] = None,
     parallel: bool = True,
     reference_dt: Optional[datetime] = None,
 ) -> ReportSection:
@@ -193,12 +205,34 @@ def process_section(
         has_pro_referrers=has_pro,
     )
 
+    # 6. Generate AI Executive Brief if Gemini is configured
+    executive_brief: Optional[str] = None
+    if gemini_client and gemini_client.is_configured:
+        print("  -> Generating Gemini AI Executive Brief... ", end="", flush=True)
+
+        def on_gemini_attempt(model: str, success: bool, err_msg: Optional[str]) -> None:
+            if not success:
+                print(f"\033[33m[{model} failed, falling back...]\033[0m ", end="", flush=True)
+
+        executive_brief = gemini_client.generate_executive_brief(
+            cadence=cadence,
+            window=window,
+            metrics=metrics,
+            on_attempt=on_gemini_attempt,
+        )
+        if executive_brief:
+            used_model = gemini_client.last_model_used or "Gemini"
+            print(f"\033[32m[OK ({used_model})]\033[0m")
+        else:
+            print("\033[31m[FAILED]\033[0m")
+
     section = ReportSection(
         cadence_key=cadence.key,
         label=cadence.label,
         display_label=cadence.display_label,
         window=window,
         metrics=metrics,
+        executive_brief=executive_brief,
     )
 
     # Print CLI terminal report
@@ -222,6 +256,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     cf_token = args.cf_token or CF_API_TOKEN
     cf_account = args.cf_account or CF_ACCOUNT_ID
     vercel_token = args.vercel_token or VERCEL_TOKEN
+    gemini_key = args.gemini_key or GEMINI_API_KEY
+    if args.no_gemini:
+        gemini_key = ""
     parallel = not args.no_parallel
 
     if not cf_token:
@@ -242,6 +279,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     cf_client = CloudflareClient(api_token=cf_token, account_id=cf_account)
     vercel_client = VercelClient(token=vercel_token, team_id=VERCEL_TEAM_ID)
+    gemini_client = GeminiClient(api_key=gemini_key)
 
     timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     reference_now = datetime.now(timezone.utc)
@@ -258,6 +296,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 cadence=cadence,
                 cf_client=cf_client,
                 vercel_client=vercel_client,
+                gemini_client=gemini_client,
                 parallel=parallel,
                 reference_dt=reference_now,
             )
@@ -271,6 +310,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             cadence=cadence,
             cf_client=cf_client,
             vercel_client=vercel_client,
+            gemini_client=gemini_client,
             parallel=parallel,
             reference_dt=reference_now,
         )

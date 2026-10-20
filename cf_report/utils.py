@@ -105,3 +105,69 @@ def calculate_time_window(
         since_dt=since_dt,
         until_dt=until_dt,
     )
+
+
+def markdown_to_html(md_text: str) -> str:
+    """
+    Convert basic Markdown to clean HTML without third-party dependencies.
+    Supports paragraphs, headers (h2-h4), unordered lists, bold, italics, and code.
+    """
+    if not md_text:
+        return ""
+
+    import html
+    import re
+
+    def inline_format(text: str) -> str:
+        t = html.escape(text)
+        # Bold: **bold** or __bold__
+        t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
+        t = re.sub(r"__(.+?)__", r"<strong>\1</strong>", t)
+        # Italic: *italic* or _italic_
+        t = re.sub(r"\*(.+?)\*", r"<em>\1</em>", t)
+        t = re.sub(r"_(.+?)_", r"<em>\1</em>", t)
+        # Inline code: `code`
+        t = re.sub(r"`(.+?)`", r"<code>\1</code>", t)
+        return t
+
+    lines = md_text.strip().splitlines()
+    html_out: list[str] = []
+    in_list = False
+
+    for raw_line in lines:
+        line = raw_line.strip()
+        if not line:
+            if in_list:
+                html_out.append("</ul>")
+                in_list = False
+            continue
+
+        # Bullet list items (- , * , or • )
+        if line.startswith(("- ", "* ", "• ")):
+            if not in_list:
+                html_out.append("<ul>")
+                in_list = True
+            item_text = line[2:].strip()
+            html_out.append(f"<li>{inline_format(item_text)}</li>")
+            continue
+
+        # Close open list if encountering a non-list line
+        if in_list:
+            html_out.append("</ul>")
+            in_list = False
+
+        # Headings
+        if line.startswith("### "):
+            html_out.append(f"<h4>{inline_format(line[4:].strip())}</h4>")
+        elif line.startswith("## "):
+            html_out.append(f"<h3>{inline_format(line[3:].strip())}</h3>")
+        elif line.startswith("# "):
+            html_out.append(f"<h2>{inline_format(line[2:].strip())}</h2>")
+        else:
+            html_out.append(f"<p>{inline_format(line)}</p>")
+
+    if in_list:
+        html_out.append("</ul>")
+
+    return "\n".join(html_out)
+

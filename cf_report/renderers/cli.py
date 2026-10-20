@@ -158,4 +158,10 @@ def render_cli_section(section: ReportSection) -> None:
         for r in m.vercel.referrers[:8]:
             print(f"     {r.label[:46]:<46} {r.count_formatted:>8}")
 
+    if section.executive_brief:
+        print("")
+        print(f"  {c.BOLD}{c.YELLOW}✨ EXECUTIVE BRIEF (GEMINI AI){c.RESET}")
+        for b_line in section.executive_brief.strip().split("\n"):
+            print(f"  {c.WHITE}{b_line}{c.RESET}")
+
     print(f"{c.BOLD}{c.CYAN}--------------------------------------------------------------------------------{c.RESET}")

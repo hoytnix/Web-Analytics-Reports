@@ -206,6 +206,15 @@ def render_markdown_section(section: ReportSection) -> str:
         lines.append("> _Zero external referrers recorded during this period._")
     lines.append("")
 
+    # Executive Brief (if available) - placed at the end after all breakdown results
+    if section.executive_brief:
+        lines.append("---")
+        lines.append("")
+        lines.append("## Executive Brief")
+        lines.append("")
+        lines.append(section.executive_brief.strip())
+        lines.append("")
+
     return "\n".join(lines)
 
 

@@ -91,6 +91,9 @@ CF_ACCOUNT_ID = get_config_var("CF_ACCOUNT_ID", "")
 VERCEL_TOKEN = get_config_var("VERCEL_TOKEN", "")
 VERCEL_TEAM_ID = get_config_var("VERCEL_TEAM_ID", "")
 
+# Gemini API Configuration
+GEMINI_API_KEY = get_config_var("GEMINI_API_KEY", "") or get_config_var("GEMINI_KEY", "")
+
 def _load_zones_config() -> Tuple[List[Tuple[str, str]], Dict[str, str], Dict[str, str]]:
     """
     Load zone IDs, Vercel project mappings, and Vercel aliases from a YAML config file.

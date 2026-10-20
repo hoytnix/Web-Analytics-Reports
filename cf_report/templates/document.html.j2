@@ -76,6 +76,75 @@
       color: #9a3412;
       margin-left: 8px;
     }
+    .brief-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-left: 4.5px solid #6366f1;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-top: 8px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .brief-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+    .brief-title {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #312e81;
+    }
+    .brief-badge {
+      font-size: 6.5pt;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: #e0e7ff;
+      color: #3730a3;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .brief-body {
+      font-size: 8.5pt;
+      line-height: 1.5;
+      color: #1e293b;
+    }
+    .brief-body h2 {
+      font-size: 10pt;
+      color: #1e293b;
+      margin: 10px 0 4px 0;
+      font-weight: 700;
+    }
+    .brief-body h3 {
+      font-size: 9.5pt;
+      color: #1e293b;
+      margin: 9px 0 4px 0;
+      font-weight: 700;
+    }
+    .brief-body h4 {
+      font-size: 9pt;
+      color: #312e81;
+      margin: 8px 0 3px 0;
+      font-weight: 700;
+    }
+    .brief-body p {
+      margin: 4px 0 6px 0;
+    }
+    .brief-body ul {
+      margin: 4px 0 8px 18px;
+      padding: 0;
+    }
+    .brief-body li {
+      margin-bottom: 3px;
+    }
+    .brief-body strong {
+      color: #0f172a;
+    }
     .grid-10 {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
@@ -171,7 +240,8 @@
       padding: 1px 3px;
       border-radius: 3px;
     }
-    .breakdown-wrapper {
+    .breakdown-wrapper,
+    .brief-wrapper {
       page-break-before: always;
       break-before: page;
       margin-top: 10px;

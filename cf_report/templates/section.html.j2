@@ -414,6 +414,28 @@
 
   </div>
 
+  {% if section.executive_brief_html %}
+  <!-- PAGE 3: EXECUTIVE BRIEF -->
+  <div class="brief-wrapper">
+    <div class="sub-header">
+      <h2>Portfolio Executive Brief &amp; Strategic Insights <span class="badge">{{ section.display_label }}</span></h2>
+      <span class="sub-meta">Gemini AI Operational Intelligence &bull; Range: {{ section.window.display_range }}</span>
+    </div>
+
+    <div class="brief-card">
+      <div class="brief-header">
+        <div class="brief-title">
+          <span>✨ Executive Brief</span>
+        </div>
+        <span class="brief-badge">Gemini AI Analysis</span>
+      </div>
+      <div class="brief-body">
+        {{ section.executive_brief_html | safe }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="footer">
     <span>Cloudflare Automated Analytics &amp; Breakdown Engine</span>
     <span>Generated: {{ generated_at }}</span>

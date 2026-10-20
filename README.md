@@ -4,6 +4,7 @@ A modular, DRY Python analytics reporting package for Cloudflare and Vercel. Int
 - **Cloudflare Zone Analytics** (Edge requests, bandwidth, cache efficiency, threats, status codes, protocols, top paths, probes)
 - **Cloudflare Web Analytics (RUM)** (Client-side pageviews, visits, traffic sources, referrers, device form factors, browsers)
 - **Vercel Web Analytics** (Pageviews, unique visitors, acquisition referrers)
+- **AI-Powered Executive Briefs** (Cascading Gemini intelligence: Gemini 3.8 Flash -> Gemini 3.5 Flash-Lite -> Gemini 3.5 Flash)
 
 ## Package Structure
 
@@ -43,7 +44,7 @@ Report/
 1. **Configure Environment Secrets:**
    ```bash
    cp .env.example .env.local
-   # Edit .env.local and populate CF_API_TOKEN, CF_ACCOUNT_ID, and optional VERCEL_TOKEN
+   # Edit .env.local and populate CF_API_TOKEN, CF_ACCOUNT_ID, optional VERCEL_TOKEN, and optional GEMINI_API_KEY
    ```
 
 2. **Configure Zones & Projects:**
@@ -105,6 +106,8 @@ Report/
 | `--cf-token` | Override Cloudflare API token |
 | `--cf-account` | Override Cloudflare Account ID |
 | `--vercel-token`| Override Vercel API token |
+| `--gemini-key` | Override Gemini API key for AI executive briefs |
+| `--no-gemini` | Disable Gemini executive brief generation even if key is set |
 | `--engine` | Force PDF engine (`weasyprint`, `chromium`, `google-chrome`) |
 
 ### Running Unit Tests
