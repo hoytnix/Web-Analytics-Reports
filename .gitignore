@@ -1,0 +1,64 @@
+# Environment and secret files
+.env.local
+.env
+.env.*.local
+*.env
+zones.yaml
+zones.yml
+zones.local.yaml
+zones.local.yml
+config.yaml
+config.yml
+config.local.yaml
+config.local.yml
+*.local.yaml
+*.local.yml
+
+# Generated Analytics Reports (Keep repo clean)
+cloudflare_report_*.pdf
+cloudflare_report_*.html
+cloudflare_report_*.md
+*.pdf
+test.pdf
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Editor and OS swap / temp files
+*.swp
+*.swo
+*~
+.DS_Store
+.idea/
+.vscode/

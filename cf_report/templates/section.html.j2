@@ -1,0 +1,421 @@
+<section class="report-section">
+  <!-- PAGE 1: PORTFOLIO SUMMARY & ZONE TABLE -->
+  <div class="header">
+    <div>
+      <h1>Cloudflare Portfolio Analytics <span class="badge">{{ section.display_label }}</span></h1>
+      <div class="meta">{{ section.metrics.zone_items|length }} Zones Monitored &bull; Range: {{ section.window.display_range }} &bull; Generated: {{ generated_at }}</div>
+    </div>
+  </div>
+
+  <div class="grid-10">
+    <div class="card">
+      <div class="card-title">Total Requests</div>
+      <div class="card-value">{{ section.metrics.total_requests | numfmt }}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Avg Cache Ratio</div>
+      <div class="card-value">{{ section.metrics.avg_cache_ratio }}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Total Bandwidth</div>
+      <div class="card-value">{{ section.metrics.total_bytes | bytesfmt }}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cached Bandwidth</div>
+      <div class="card-value">{{ section.metrics.cached_bytes | bytesfmt }}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">CF Edge Views</div>
+      <div class="card-value">{{ section.metrics.total_cf_views | numfmt }}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Threats Blocked</div>
+      <div class="card-value">{{ section.metrics.total_threats | numfmt }}</div>
+    </div>
+    <div class="card card-cf-rum">
+      <div class="card-title">CF Web Views</div>
+      <div class="card-value">{{ section.metrics.total_cf_web_views | numfmt }}</div>
+    </div>
+    <div class="card card-cf-rum">
+      <div class="card-title">CF Web Visits</div>
+      <div class="card-value">{{ section.metrics.total_cf_web_visits | numfmt }}</div>
+    </div>
+    <div class="card card-vercel">
+      <div class="card-title">Vercel Views</div>
+      <div class="card-value">{% if section.metrics.vercel.is_configured %}{{ section.metrics.total_vercel_views | numfmt }}{% else %}-{% endif %}</div>
+    </div>
+    <div class="card card-vercel">
+      <div class="card-title">Vercel Visitors</div>
+      <div class="card-value">{% if section.metrics.vercel.is_configured %}{{ section.metrics.total_vercel_visitors | numfmt }}{% else %}-{% endif %}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Zone Domain</th>
+        <th class="num">Requests</th>
+        <th class="num">Cache %</th>
+        <th class="num">Bandwidth</th>
+        <th class="num">Cached BW</th>
+        <th class="num">Edge Views</th>
+        <th class="num">Threats</th>
+        <th class="num" style="color: #ea580c;">CF Web Views</th>
+        <th class="num" style="color: #ea580c;">CF Web Visits</th>
+        <th class="num" style="color: #0284c7;">Vercel Views</th>
+        <th class="num" style="color: #0284c7;">Vercel Vis</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for z in section.metrics.zone_items %}
+      <tr>
+        <td class="domain-name"><strong>{{ z.zone_name }}</strong><br><span class="zone-tag">{{ z.zone_id }}</span></td>
+        <td class="num">{{ z.requests | numfmt }}</td>
+        <td class="num">{{ z.hit_ratio }}</td>
+        <td class="num">{{ z.bytes | bytesfmt }}</td>
+        <td class="num">{{ z.cached_bytes | bytesfmt }}</td>
+        <td class="num">{{ z.cf_views | numfmt }}</td>
+        <td class="num">{{ z.cf_threats | numfmt }}</td>
+        <td class="num" style="font-weight: 600; color: #9a3412;">{{ z.cf_web_views | numfmt }}</td>
+        <td class="num" style="font-weight: 600; color: #9a3412;">{{ z.cf_web_visits | numfmt }}</td>
+        <td class="num">{% if z.vercel_views is not none %}{{ z.vercel_views | numfmt }}{% else %}-{% endif %}</td>
+        <td class="num">{% if z.vercel_visitors is not none %}{{ z.vercel_visitors | numfmt }}{% else %}-{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- PAGE 2: DEEP ANALYTICS BREAKDOWN -->
+  <div class="breakdown-wrapper">
+    <div class="sub-header">
+      <h2>Portfolio Deep Analytics &amp; Breakdown Specs</h2>
+      <span class="sub-meta">Multi-node breakdown across all active endpoints and real user telemetry</span>
+    </div>
+
+    <!-- Row 1: Subdomains & Countries -->
+    <div class="grid-2col">
+      <div class="panel">
+        <div class="panel-header">
+          <span>1. Per Subdomain (Hostnames)</span>
+          <span class="tag tag-blue">Traffic Distribution</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Hostname</th>
+              <th class="num">Requests</th>
+              <th class="num">Share</th>
+              <th class="num">Bandwidth</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in section.metrics.subdomains %}
+            <tr>
+              <td><code>{{ item.label }}</code></td>
+              <td class="num">{{ item.count_formatted }}</td>
+              <td class="num">{{ item.share_pct }}</td>
+              <td class="num">{{ item.bytes_formatted }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>2. Geographic Distribution</span>
+          <span class="tag tag-green">Visitor Origin</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Country / Territory</th>
+              <th class="num">Requests</th>
+              <th class="num">Share</th>
+              <th class="num">Bandwidth</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in section.metrics.countries %}
+            <tr>
+              <td><strong>{{ item.key }}</strong> - {{ item.label }}</td>
+              <td class="num">{{ item.count_formatted }}</td>
+              <td class="num">{{ item.share_pct }}</td>
+              <td class="num">{{ item.bytes_formatted }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Row 2: Status Codes & Caching -->
+    <div class="grid-2col">
+      <div class="panel">
+        <div class="panel-header">
+          <span>3. HTTP Status Codes &amp; Origin Health</span>
+          <span class="tag {% if section.metrics.status_health.origin_error_rate == '0.0%' %}tag-green{% else %}tag-amber{% endif %}">Error Rate: {{ section.metrics.status_health.origin_error_rate }}</span>
+        </div>
+        <div class="stat-pills-grid">
+          <div class="stat-pill"><div class="pill-lbl">2xx Success</div><div class="pill-val color-green">{{ section.metrics.status_health.s2xx.count_formatted }} ({{ section.metrics.status_health.s2xx.share_pct }})</div></div>
+          <div class="stat-pill"><div class="pill-lbl">3xx Redirect</div><div class="pill-val color-blue">{{ section.metrics.status_health.s3xx.count_formatted }} ({{ section.metrics.status_health.s3xx.share_pct }})</div></div>
+          <div class="stat-pill"><div class="pill-lbl">4xx Client Err</div><div class="pill-val color-amber">{{ section.metrics.status_health.s4xx.count_formatted }} ({{ section.metrics.status_health.s4xx.share_pct }})</div></div>
+          <div class="stat-pill"><div class="pill-lbl">5xx Origin Err</div><div class="pill-val color-rose">{{ section.metrics.status_health.s5xx.count_formatted }} ({{ section.metrics.status_health.s5xx.share_pct }})</div></div>
+        </div>
+        <div class="metric-note">
+          Origin Downtime Indicator: <strong>{{ section.metrics.status_health.origin_error_rate }}</strong> 5xx error rate across all edge responses.
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>4. Cache Efficiency &amp; Bandwidth Savings</span>
+          <span class="tag tag-amber">Offload Performance</span>
+        </div>
+        <div class="stat-pills-grid">
+          <div class="stat-pill"><div class="pill-lbl">Request CHR</div><div class="pill-val">{{ section.metrics.cache_efficiency.req_hit_ratio }}</div></div>
+          <div class="stat-pill"><div class="pill-lbl">Bandwidth CHR</div><div class="pill-val">{{ section.metrics.cache_efficiency.bytes_hit_ratio }}</div></div>
+          <div class="stat-pill"><div class="pill-lbl">Saved Bandwidth</div><div class="pill-val color-green">{{ section.metrics.cache_efficiency.saved_bytes }}</div></div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th class="num">Requests</th>
+              <th class="num">Share</th>
+              <th class="num">Bandwidth</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in section.metrics.cache_efficiency.breakdown %}
+            <tr>
+              <td><span class="badge-cache badge-cache-{{ item.key | lower }}">{{ item.key }}</span></td>
+              <td class="num">{{ item.count_formatted }}</td>
+              <td class="num">{{ item.share_pct }}</td>
+              <td class="num">{{ item.bytes_formatted }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Row 3: Endpoints & Protocols -->
+    <div class="grid-2col">
+      <div class="panel">
+        <div class="panel-header">
+          <span>5. Top Endpoints &amp; Probe Detections</span>
+          <span class="tag tag-rose">Endpoints &amp; 404 Probes</span>
+        </div>
+        <div class="split-tables">
+          <div class="split-col">
+            <div class="mini-title">Top Visited Routes</div>
+            <table>
+              <thead><tr><th>Path</th><th class="num">Reqs</th></tr></thead>
+              <tbody>
+                {% for item in section.metrics.paths %}
+                <tr><td><code>{{ item.label }}</code></td><td class="num">{{ item.count_formatted }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="split-col">
+            <div class="mini-title">Suspicious Probes / Scans</div>
+            <table>
+              <thead><tr><th>Probe Path</th><th class="num">Reqs</th></tr></thead>
+              <tbody>
+                {% for item in section.metrics.probes %}
+                <tr><td><code>{{ item.path }}</code></td><td class="num"><span class="badge-status badge-4xx">{{ item.status }}</span> {{ item.count_formatted }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>6. Client Protocols &amp; Modern TLS</span>
+          <span class="tag tag-blue">Web Standards</span>
+        </div>
+        <div class="stat-pills-grid">
+          <div class="stat-pill"><div class="pill-lbl">HTTP/3 QUIC</div><div class="pill-val">{{ section.metrics.protocols.h3_adoption }}</div></div>
+          <div class="stat-pill"><div class="pill-lbl">TLS 1.3 Modern</div><div class="pill-val color-green">{{ section.metrics.protocols.tls13_adoption }}</div></div>
+        </div>
+        <div class="split-tables">
+          <div class="split-col">
+            <div class="mini-title">HTTP Protocol</div>
+            <table>
+              <thead><tr><th>Version</th><th class="num">Reqs</th><th class="num">%</th></tr></thead>
+              <tbody>
+                {% for item in section.metrics.protocols.http_breakdown %}
+                <tr><td><strong>{{ item.label }}</strong></td><td class="num">{{ item.count_formatted }}</td><td class="num">{{ item.share_pct }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="split-col">
+            <div class="mini-title">SSL / TLS Cipher</div>
+            <table>
+              <thead><tr><th>Protocol</th><th class="num">Reqs</th><th class="num">%</th></tr></thead>
+              <tbody>
+                {% for item in section.metrics.protocols.ssl_breakdown %}
+                <tr><td>{{ item.label }}</td><td class="num">{{ item.count_formatted }}</td><td class="num">{{ item.share_pct }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: Security Mitigation & Cloudflare Web Analytics (RUM Traffic Sources) -->
+    <div class="grid-2col">
+      <div class="panel">
+        <div class="panel-header">
+          <span>7. Security &amp; Threat Mitigation</span>
+          <span class="tag tag-rose">WAF &amp; Firewalls</span>
+        </div>
+        <div class="metric-note" style="margin-top:0;">
+          Total Mitigated Threats: <strong>{{ section.metrics.security.total_threats_formatted }}</strong> events triggered during reporting period.
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Source</th>
+              <th class="num">Events</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if section.metrics.security.breakdown %}
+              {% for item in section.metrics.security.breakdown %}
+              <tr>
+                <td><code>{{ item.action }}</code></td>
+                <td><code>{{ item.source }}</code></td>
+                <td class="num">{{ item.count_formatted }}</td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="3" style="text-align:center;color:#16a34a;padding:8px;">Zero threats mitigated (All traffic clean)</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>8. Cloudflare Web Analytics (Traffic Sources &amp; Referrers)</span>
+          <span class="tag tag-orange">CF RUM Telemetry</span>
+        </div>
+        <div class="metric-note" style="margin-top:0;">
+          Client-Side Web Analytics across all monitored sites: <strong>{{ section.metrics.total_cf_web_views | numfmt }}</strong> views, <strong>{{ section.metrics.total_cf_web_visits | numfmt }}</strong> visits.
+        </div>
+        {% if section.metrics.web_analytics.top_referrers %}
+        <table>
+          <thead>
+            <tr>
+              <th>Referring Source / Host</th>
+              <th class="num">Pageviews</th>
+              <th class="num">Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in section.metrics.web_analytics.top_referrers %}
+            <tr>
+              <td><code>{{ item.label }}</code></td>
+              <td class="num">{{ item.count_formatted }}</td>
+              <td class="num">{{ item.share_pct }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div style="text-align:center;color:#64748b;padding:12px;font-size:7.5pt;">Zero client-side referrers recorded in this period</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Row 5: Cloudflare Web Analytics Devices & Vercel Referrers -->
+    <div class="grid-2col">
+      <div class="panel">
+        <div class="panel-header">
+          <span>9. Cloudflare Web Analytics (Devices &amp; Browsers)</span>
+          <span class="tag tag-orange">User Environments</span>
+        </div>
+        <div class="split-tables">
+          <div class="split-col">
+            <div class="mini-title">Device Form Factor</div>
+            <table>
+              <thead><tr><th>Device</th><th class="num">Views</th><th class="num">%</th></tr></thead>
+              <tbody>
+                {% for item in section.metrics.web_analytics.top_devices %}
+                <tr><td>{{ item.label }}</td><td class="num">{{ item.count_formatted }}</td><td class="num">{{ item.share_pct }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="split-col">
+            <div class="mini-title">Web Browser</div>
+            <table>
+              <thead><tr><th>Browser</th><th class="num">Views</th><th class="num">%</th></tr></thead>
+              <tbody>
+                {% for item in section.metrics.web_analytics.top_browsers %}
+                <tr><td>{{ item.label }}</td><td class="num">{{ item.count_formatted }}</td><td class="num">{{ item.share_pct }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>10. Vercel Top Referrers &amp; Traffic Sources</span>
+          <span class="tag tag-purple">Vercel Acquisition</span>
+        </div>
+        {% if not section.metrics.vercel.is_configured %}
+        <div class="notice-box">
+          <strong>Vercel Integration Configuration:</strong><br>
+          Export <code>VERCEL_TOKEN</code> to populate real client-side acquisition and referring sources via Vercel Web Analytics.
+        </div>
+        {% elif section.metrics.vercel.referrers %}
+        <table>
+          <thead>
+            <tr>
+              <th>Traffic Source / Referrer</th>
+              <th class="num">Visits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in section.metrics.vercel.referrers %}
+            <tr>
+              <td><code>{{ item.label }}</code></td>
+              <td class="num">{{ item.count_formatted }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <table>
+          <thead>
+            <tr>
+              <th>Traffic Source / Referrer</th>
+              <th class="num">Visits</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="2" style="text-align:center;color:#64748b;padding:8px;">Zero external referrers recorded in this period</td></tr>
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span>Cloudflare Automated Analytics &amp; Breakdown Engine</span>
+    <span>Generated: {{ generated_at }}</span>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+# Example Cloudflare & Vercel Configuration
+# Copy this file to zones.yaml and replace with your actual Zone IDs and Project IDs.
+
+# Cloudflare Zone IDs and Domains to monitor
+zones:
+  - id: 00000000000000000000000000000001
+    domain: example.com
+  - id: 00000000000000000000000000000002
+    domain: myapp.com
+
+# Vercel Project Mappings (Domain -> Vercel Project Identifier)
+vercel_projects:
+  example.com: prj_example1234567890abcdef
+  myapp.com: prj_myapp1234567890abcdef
+
+# Optional Vercel Slug Aliases (CLI slug -> Project Identifier)
+vercel_aliases:
+  example: prj_example1234567890abcdef
+  myapp: prj_myapp1234567890abcdef
